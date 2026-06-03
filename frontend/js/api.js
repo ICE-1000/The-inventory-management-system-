@@ -1,4 +1,4 @@
-const API_BASE = localStorage.getItem('apiBase') || 'http://localhost:8080/api';
+const API_BASE = localStorage.getItem('apiBase') || 'https://the-inventory-management-system-ni8e.onrender.com/api';
 
 function token() {
     return localStorage.getItem('token');

@@ -1,4 +1,4 @@
-const LOGIN_API_BASE = localStorage.getItem('apiBase') || 'http://localhost:8080/api';
+const LOGIN_API_BASE = localStorage.getItem('apiBase') || 'https://the-inventory-management-system-ni8e.onrender.com/api';
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
