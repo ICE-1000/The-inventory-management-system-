@@ -33,6 +33,11 @@ public class InventoryRequestController {
         this.userService = userService;
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Requests controller is reachable");
+    }
+
     @PreAuthorize("hasRole('DEPARTMENT')")
     @PostMapping
     public ResponseEntity<InventoryRequestDTO> createRequest(@Valid @RequestBody CreateRequestDTO dto) {
