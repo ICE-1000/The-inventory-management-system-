@@ -40,6 +40,39 @@ function requireAuth(role) {
     if (btn) btn.addEventListener('click', logout);
 }
 
-function renderRows(tbody, rows, renderer) {
-    tbody.innerHTML = rows.length ? rows.map(renderer).join('') : '<tr><td colspan="8">No records found.</td></tr>';
+function escapeHtml(value) {
+    if (!value) return '';
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function renderRows(tbody, rows, renderer, colspan = 8) {
+    tbody.innerHTML = rows.length ? rows.map(renderer).join('') : `<tr><td colspan="${colspan}">No records found.</td></tr>`;
+}
+
+async function createRequest(payload) {
+    return api('/requests', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+}
+
+async function fetchMyRequests() {
+    return api('/requests/me');
+}
+
+async function fetchAllRequests(status) {
+    const query = status ? `?status=${encodeURIComponent(status)}` : '';
+    return api(`/requests${query}`);
+}
+
+async function updateRequestStatus(id, status, rejectionReason) {
+    return api(`/requests/${id}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status, rejectionReason })
+    });
 }

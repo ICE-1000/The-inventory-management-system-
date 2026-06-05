@@ -19,6 +19,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidRequestStatusTransitionException.class)
+    public ResponseEntity<ApiError> invalidTransition(InvalidRequestStatusTransitionException ex) {
+        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> validation(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(new ApiError("Validation failed"));
