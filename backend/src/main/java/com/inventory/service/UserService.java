@@ -40,6 +40,9 @@ public class UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already exists");
         }
+        if (request.getRole() == Role.DEPARTMENT && request.getDepartmentId() == null) {
+            throw new BadRequestException("Department ID is required for DEPARTMENT role");
+        }
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -58,7 +61,7 @@ public class UserService {
         if (authentication == null || authentication.getName() == null) {
             throw new BadRequestException("No authenticated user");
         }
-        return userRepository.findByUsername(authentication.getName())
+        return userRepository.findByUsernameWithDepartment(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 

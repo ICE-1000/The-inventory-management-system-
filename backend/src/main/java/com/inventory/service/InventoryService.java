@@ -2,6 +2,7 @@ package com.inventory.service;
 
 import com.inventory.dto.InventoryDTO;
 import com.inventory.dto.InventoryStatsDTO;
+import com.inventory.exception.BadRequestException;
 import com.inventory.exception.ResourceNotFoundException;
 import com.inventory.model.Inventory;
 import com.inventory.repository.InventoryRepository;
@@ -42,9 +43,12 @@ public class InventoryService {
 
     @Transactional
     public InventoryDTO create(InventoryDTO dto) {
+        validateQuantities(dto);
         Inventory inventory = new Inventory();
         apply(dto, inventory);
-        inventory.setAvailableQuantity(dto.getAvailableQuantity() > 0 ? dto.getAvailableQuantity() : dto.getQuantity());
+        inventory.setAvailableQuantity(dto.getAvailableQuantity() > 0 || dto.getAllocatedQuantity() > 0
+                ? dto.getAvailableQuantity()
+                : dto.getQuantity());
         inventory.setAllocatedQuantity(Math.max(dto.getAllocatedQuantity(), 0));
         inventory.setStatus(inventory.getAvailableQuantity() == 0 ? "ALLOCATED" : "AVAILABLE");
         return toDto(inventoryRepository.save(inventory));
@@ -54,11 +58,10 @@ public class InventoryService {
     public InventoryDTO update(UUID id, InventoryDTO dto) {
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+        validateQuantities(dto);
         apply(dto, inventory);
-        if (dto.getAvailableQuantity() + dto.getAllocatedQuantity() <= dto.getQuantity()) {
-            inventory.setAvailableQuantity(dto.getAvailableQuantity());
-            inventory.setAllocatedQuantity(dto.getAllocatedQuantity());
-        }
+        inventory.setAvailableQuantity(dto.getAvailableQuantity());
+        inventory.setAllocatedQuantity(dto.getAllocatedQuantity());
         inventory.setStatus(inventory.getAvailableQuantity() == 0 ? "ALLOCATED" : "AVAILABLE");
         return toDto(inventoryRepository.save(inventory));
     }
@@ -80,6 +83,15 @@ public class InventoryService {
         inventory.setSerialNumber(dto.getSerialNumber());
         inventory.setCondition(dto.getCondition());
         inventory.setBarcodeImageUrl(dto.getBarcodeImageUrl());
+    }
+
+    private void validateQuantities(InventoryDTO dto) {
+        if (dto.getQuantity() < 0 || dto.getAvailableQuantity() < 0 || dto.getAllocatedQuantity() < 0) {
+            throw new BadRequestException("Quantities cannot be negative");
+        }
+        if (dto.getAvailableQuantity() + dto.getAllocatedQuantity() > dto.getQuantity()) {
+            throw new BadRequestException("Available + allocated cannot exceed total quantity");
+        }
     }
 
     public InventoryDTO toDto(Inventory inventory) {

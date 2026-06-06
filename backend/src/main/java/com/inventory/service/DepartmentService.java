@@ -5,6 +5,7 @@ import com.inventory.exception.ResourceNotFoundException;
 import com.inventory.model.Department;
 import com.inventory.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,13 @@ public class DepartmentService {
 
     public Department get(UUID id) {
         return departmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+        departmentRepository.delete(department);
     }
 
     private DepartmentDTO toDto(Department department) {

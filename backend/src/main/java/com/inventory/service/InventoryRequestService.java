@@ -10,6 +10,7 @@ import com.inventory.model.InventoryRequest;
 import com.inventory.model.RequestStatus;
 import com.inventory.model.User;
 import com.inventory.repository.InventoryRequestRepository;
+import com.inventory.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,35 +21,43 @@ import java.util.stream.Collectors;
 @Service
 public class InventoryRequestService {
     private final InventoryRequestRepository requestRepository;
+    private final UserRepository userRepository;
 
-    public InventoryRequestService(InventoryRequestRepository requestRepository) {
+    public InventoryRequestService(InventoryRequestRepository requestRepository, UserRepository userRepository) {
         this.requestRepository = requestRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
     public InventoryRequestDTO createRequest(CreateRequestDTO dto, User currentUser) {
-        if (currentUser.getDepartment() == null) {
+        User userWithDept = userRepository.findByIdWithDepartment(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (userWithDept.getDepartment() == null) {
             throw new BadRequestException("Department user must belong to a department");
         }
         if (dto.getQuantity() == null || dto.getQuantity() < 1) {
             throw new BadRequestException("Quantity must be at least 1");
         }
         InventoryRequest request = new InventoryRequest();
-        request.setDepartment(currentUser.getDepartment());
+        request.setDepartment(userWithDept.getDepartment());
         request.setItemName(dto.getItemName());
         request.setQuantity(dto.getQuantity());
         request.setNeededBy(dto.getNeededBy());
         request.setDescription(dto.getDescription());
         request.setStatus(RequestStatus.PENDING);
-        request.setCreatedBy(currentUser);
-        return toDto(requestRepository.save(request));
+        request.setCreatedBy(userWithDept);
+
+        InventoryRequest saved = requestRepository.save(request);
+        return toDto(saved);
     }
 
     @Transactional(readOnly = true)
     public List<InventoryRequestDTO> getRequestsForDepartment(UUID departmentId) {
-        return requestRepository.findByDepartmentIdOrderByCreatedAtDesc(departmentId).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        List<InventoryRequest> requests = requestRepository.findByDepartmentIdWithDepartment(departmentId);
+        return requests.stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -90,8 +99,8 @@ public class InventoryRequestService {
     private InventoryRequestDTO toDto(InventoryRequest request) {
         InventoryRequestDTO dto = new InventoryRequestDTO();
         dto.setId(request.getId());
-        dto.setDepartmentId(request.getDepartment().getId());
-        dto.setDepartmentName(request.getDepartment().getDepartmentName());
+        dto.setDepartmentId(request.getDepartment() != null ? request.getDepartment().getId() : null);
+        dto.setDepartmentName(request.getDepartment() != null ? request.getDepartment().getDepartmentName() : null);
         dto.setItemName(request.getItemName());
         dto.setQuantity(request.getQuantity());
         dto.setNeededBy(request.getNeededBy());

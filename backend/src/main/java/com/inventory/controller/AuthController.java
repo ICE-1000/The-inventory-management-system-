@@ -41,7 +41,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = tokenProvider.generateToken(userDetails);
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+        User user = userRepository.findByUsernameWithDepartment(userDetails.getUsername()).orElseThrow();
         return ResponseEntity.ok(new AuthResponse(
                 token,
                 user.getRole().name(),
