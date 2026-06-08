@@ -40,6 +40,9 @@ public class User {
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @Column(name = "deleted")
+    private boolean deleted = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -57,4 +60,6 @@ public class User {
     public void setDepartment(Department department) { this.department = department; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }

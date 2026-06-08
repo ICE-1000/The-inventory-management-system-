@@ -34,10 +34,10 @@ public class UserService {
 
     @Transactional
     public User register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsernameAndDeletedFalse(request.getUsername())) {
             throw new BadRequestException("Username already exists");
         }
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmailAndDeletedFalse(request.getEmail())) {
             throw new BadRequestException("Email already exists");
         }
         if (request.getRole() == Role.DEPARTMENT && request.getDepartmentId() == null) {
@@ -71,17 +71,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserDTO> findAllUsers() {
-        return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return userRepository.findByDeletedFalse().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Transactional
     public UserDTO updateUser(UUID id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (userRepository.existsByUsernameAndIdNot(request.getUsername(), id)) {
+        if (userRepository.existsByUsernameAndIdNotAndDeletedFalse(request.getUsername(), id)) {
             throw new BadRequestException("Username already exists");
         }
-        if (userRepository.existsByEmailAndIdNot(request.getEmail(), id)) {
+        if (userRepository.existsByEmailAndIdNotAndDeletedFalse(request.getEmail(), id)) {
             throw new BadRequestException("Email already exists");
         }
 
@@ -106,10 +106,10 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setDeleted(true);
+        userRepository.save(user);
     }
 
     public List<UserDTO> findAll() {
