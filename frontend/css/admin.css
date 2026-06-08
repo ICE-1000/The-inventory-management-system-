@@ -40,7 +40,7 @@
     margin-bottom: 22px;
 }
 .card {
-    background: white;
+    
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 18px;
@@ -48,7 +48,7 @@
 .card h3 { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
 .card p { margin: 0; font-size: 30px; font-weight: 800; }
 .panel {
-    background: white;
+    
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 18px;
