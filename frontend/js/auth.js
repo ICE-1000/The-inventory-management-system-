@@ -1,10 +1,10 @@
 const LOGIN_API_BASE = (() => {
     const configuredBase = localStorage.getItem('apiBase');
     if (configuredBase) return configuredBase;
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:8080/api';
-    }
-    return '/api';
+    //if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'https://the-inventory-management-system-ni8e.onrender.com/api'; //http://localhost:8080/api
+    //}
+    //return '/api';
 })();
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {

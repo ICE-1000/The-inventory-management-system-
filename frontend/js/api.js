@@ -1,10 +1,10 @@
 const API_BASE = (() => {
     const configuredBase = localStorage.getItem('apiBase');
     if (configuredBase) return configuredBase;
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+   // if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return 'https://the-inventory-management-system-ni8e.onrender.com/api'; //http://localhost:8080/api for my later local testing
-    }
-    return '/api';
+   // }
+    //return '/api';
 })();
 
 function token() {
