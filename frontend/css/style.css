@@ -85,7 +85,7 @@ body.bg-im1,
 body.bg-im2,
 body.bg-im3,
 body.bg-im4,
-body.bg-im5 {
+body.bg-im6 {
     min-height: 100vh;
     background-size: cover;
     background-attachment: fixed;
@@ -97,14 +97,14 @@ body.bg-im1 { background-image: url("../images/im1.jpg"); }
 body.bg-im2 { background-image: url("../images/im2.png"); }
 body.bg-im3 { background-image: url("../images/im3.jpg"); }
 body.bg-im4 { background-image: url("../images/im4.jpg"); }
-body.bg-im5 { background-image: url("../images/im5.jpg"); }
+body.bg-im6 { background-image: url("../images/im6.png"); }
 
 /* Semi-transparent white overlay for content containers so text remains readable */
 .panel,
 .card,
 .table-wrap,
 .login-panel {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.74);
 }
 
 /* For a stronger glass effect on supported browsers (optional) */
